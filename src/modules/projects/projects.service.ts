@@ -4,12 +4,15 @@ import { UpdateProjectDto } from "./dto/update-project.dto";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { Project } from "./entities/projects.entity";
+import { PageService } from "../pagination/page/page.service";
+import { DEFAULT_PAGE_SIZE, FilterDto } from "../pagination/filter.dto";
 
 @Injectable()
 export class ProjectsService {
     constructor(
         @InjectRepository(Project)
         private readonly projectRepository: Repository<Project>,
+        private readonly pageService: PageService,
     ) { }
 
     create(createProjectDto: CreateProjectDto) {
@@ -30,8 +33,19 @@ export class ProjectsService {
     update(id: number, updateProjectDto: UpdateProjectDto) {
         return this.projectRepository.update(id, updateProjectDto);
     }
-    
+
     async remove(id: number) {
         await this.projectRepository.delete(id);
+    }
+
+    findAllPaginated(filter?: FilterDto) {
+        if (!filter) {
+            return this.findAll();
+        }
+        
+        return this.pageService.paginate(this.projectRepository, {
+            page: filter.page,
+            pageSize: DEFAULT_PAGE_SIZE,
+        });
     }
 }
