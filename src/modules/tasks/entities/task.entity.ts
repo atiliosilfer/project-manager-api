@@ -1,5 +1,6 @@
 import { Project } from "src/modules/projects/entities/projects.entity";
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { User } from "src/modules/users/entities/user.entity";
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
 export class Task {
@@ -16,6 +17,10 @@ export class Task {
         cascade: true,
         nullable: false,
     })
+
+    @ManyToOne(() => User, (user) => user.tasks)
+    @JoinColumn()
+    user: User;
     
     project: Project;
 }
